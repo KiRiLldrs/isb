@@ -1,5 +1,5 @@
-import json
 from collections import Counter
+import json
 
 import const
 
