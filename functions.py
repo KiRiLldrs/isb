@@ -1,6 +1,7 @@
 from collections import Counter
 import json
 
+
 import const
 
 def read_file(filename: str)->str:
