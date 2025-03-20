@@ -1,8 +1,8 @@
 from collections import Counter
 import json
 
+from const import ALPHABET
 
-import const
 
 def read_file(filename: str)->str:
     """
@@ -32,8 +32,8 @@ def tritemius_cipher(text: str, key: str)->str:
     :param key: word that will be using for encryption
     :return: encrypted text as a string
     """
-    char_to_num = {char: const.ALPHABET.index(char) for char in const.ALPHABET}
-    num_to_char = {i + 1: const.ALPHABET[i] for i in range(len(const.ALPHABET))}
+    char_to_num = {char: ALPHABET.index(char) for char in ALPHABET}
+    num_to_char = {i + 1: ALPHABET[i] for i in range(len(ALPHABET))}
 
     text = text.upper()
     key = key.upper()
@@ -48,8 +48,8 @@ def tritemius_cipher(text: str, key: str)->str:
             key_num = char_to_num[key_char]
 
             encrypted_num = text_num + key_num
-            if encrypted_num > len(const.ALPHABET):
-                encrypted_num -= len(const.ALPHABET)
+            if encrypted_num > len(ALPHABET):
+                encrypted_num -= len(ALPHABET)
             encrypted_text.append(num_to_char[encrypted_num])
 
             key_id+=1

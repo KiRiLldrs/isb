@@ -1,6 +1,7 @@
 import argparse
 import functions
 
+
 def create_parser()->tuple:
     """
     Gets a path to key, decrypted and encrypted texts for task1 and key, encrypted and decrypted texts for task2
