@@ -1,5 +1,6 @@
-from collections import Counter
 import json
+
+from collections import Counter
 
 from const import ALPHABET
 
