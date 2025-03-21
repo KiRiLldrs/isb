@@ -1,8 +1,7 @@
+from collections import Counter
 import json
 
-from collections import Counter
-
-from const import ALPHABET
+from const import ALPHABET, JSON_FREQUENCY
 
 
 def read_file(filename: str)->str:
@@ -60,7 +59,7 @@ def tritemius_cipher(text: str, key: str)->str:
     return ''.join(encrypted_text)
 
 
-def get_frequency(filename: str)->None:
+def get_frequency(filename: str)->dict:
     """
     Gets a frequency for every character in the text
     :param filename: directory to the text file
@@ -68,9 +67,12 @@ def get_frequency(filename: str)->None:
     char_count = Counter(filename)
     total_chars = len(filename)
     char_frequency = {char: count/total_chars for char, count in char_count.items() }
-    sorted_char_frequency = dict(sorted(char_frequency.items(), key=lambda item: item[1], reverse=True))
+    return dict(sorted(char_frequency.items(), key=lambda item: item[1], reverse=True))
+
+
+def get_json_frequency(frequency: dict)->None:
     with open("frequency_analysis.json", 'w', encoding='utf-8') as file:
-        json.dump(sorted_char_frequency, file, ensure_ascii=False, indent=4)
+        json.dump(JSON_FREQUENCY, file, ensure_ascii=False, indent=4)
 
 
 def get_key(filename: str)->dict:
