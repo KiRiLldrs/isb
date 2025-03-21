@@ -29,7 +29,7 @@ def main():
 
         task2_key = create_parser()[3]
         original_text_task2 = functions.read_file(create_parser()[4])
-        functions.get_frequency(original_text_task2)
+        functions.get_json_frequency(functions.get_frequency(original_text_task2))
 
         task2_decrypted = create_parser()[5]
 
