@@ -1,5 +1,7 @@
 import math
 
+import scipy.special as sp
+
 def open_file(filename: str)->str:
     with open (filename, "r") as file:
         sequence = file.read()
@@ -30,4 +32,49 @@ def consecutive_identical_test(sequence: str):
         return math.erfc(numerator/denominator)
     else:
         return 0
+
+
+def max_consecutive_ones(block)->int:
+    max_len = 0
+    current_len = 0
+    for bit in block:
+        if bit == "1":
+            current_len+=1
+            max_len = max(max_len, current_len)
+        else:
+            current_len = 0
+    return max_len
+
+
+def block_statistic(sequence)->tuple:
+    blocks = [sequence[i:i+8] for i in range(0, len(sequence), 8)]
+    V1, V2, V3, V4 = 0, 0, 0, 0
+
+    for block in blocks:
+        max_len = max_consecutive_ones(block)
+        if max_len <= 1:
+            V1 += 1
+        elif max_len == 2:
+            V2 += 1
+        elif max_len == 3:
+            V3 +=1
+        else:
+            V4 += 1
+
+    return V1, V2, V3, V4
+
+
+def longest_sequence_in_block_test(results: tuple)->int:
+    pi = [0.2148, 0.3672, 0.2305, 0.1875]
+    chi_square = 0
+
+    for i in range(0,4):
+        chi_square += ((results[i] - 16*pi[i])**2) / (16*pi[i])
+
+    return sp.gammainc(3/2, chi_square/2)
+
+
+
+
+
 
