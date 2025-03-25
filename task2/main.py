@@ -2,6 +2,7 @@ import argparse
 
 import NIST
 
+
 def create_parser()->tuple:
     parser = argparse.ArgumentParser()
     parser.add_argument("cpp_sequence", type=str, help="path to file with sequence, created in c++")
