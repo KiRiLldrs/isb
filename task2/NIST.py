@@ -14,6 +14,16 @@ def open_file(filename: str)->str:
     return sequence
 
 
+def write_file(text: str, filename: str)->None:
+    """
+    Writes results to file
+    :param text: text that will be added to file
+    :param filename: directory of the file
+    """
+    with open(filename, "a") as file:
+        file.write(text)
+
+
 def frequency_test(sequence: str):
     """
     NIST frequency bitwise test
@@ -79,6 +89,7 @@ def block_statistic(sequence)->tuple:
 
     for block in blocks:
         max_len = max_consecutive_ones(block)
+
         if max_len <= 1:
             V1 += 1
         elif max_len == 2:
@@ -87,7 +98,6 @@ def block_statistic(sequence)->tuple:
             V3 +=1
         else:
             V4 += 1
-
     return V1, V2, V3, V4
 
 
