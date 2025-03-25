@@ -2,13 +2,24 @@ import math
 
 import scipy.special as sp
 
+
 def open_file(filename: str)->str:
+    """
+    Opens the file with the random sequence
+    :param filename: directory of the file
+    :return: sequence as str
+    """
     with open (filename, "r") as file:
         sequence = file.read()
     return sequence
 
 
 def frequency_test(sequence: str):
+    """
+    NIST frequency bitwise test
+    :param sequence: random sequence
+    :return: P-value
+    """
     length = len(sequence)
     one = sequence.count("1")
     zero = sequence.count("0")
@@ -18,7 +29,13 @@ def frequency_test(sequence: str):
 
     return probability
 
+
 def consecutive_identical_test(sequence: str):
+    """
+    NIST test for identical consecutive bits.
+    :param sequence: random sequence
+    :return: P-value
+    """
     length = len(sequence)
     ones_percentage  = sequence.count("1")/length
     if abs(ones_percentage - 1/2) < 2/(length**0.5):
@@ -35,6 +52,11 @@ def consecutive_identical_test(sequence: str):
 
 
 def max_consecutive_ones(block)->int:
+    """
+    Calculates the maximum sequence of identical bits in block
+    :param block: the block of 8 bits
+    :return: length of maximum sequence
+    """
     max_len = 0
     current_len = 0
     for bit in block:
@@ -47,6 +69,11 @@ def max_consecutive_ones(block)->int:
 
 
 def block_statistic(sequence)->tuple:
+    """
+    Calculates statistic of identical bits in each block
+    :param sequence: random sequence
+    :return: statistic as tuple
+    """
     blocks = [sequence[i:i+8] for i in range(0, len(sequence), 8)]
     V1, V2, V3, V4 = 0, 0, 0, 0
 
@@ -65,6 +92,11 @@ def block_statistic(sequence)->tuple:
 
 
 def longest_sequence_in_block_test(results: tuple)->int:
+    """
+    NIST test for the longest sequence of units in a block.
+    :param results: statistic as tuple
+    :return: P-value
+    """
     pi = [0.2148, 0.3672, 0.2305, 0.1875]
     chi_square = 0
 
