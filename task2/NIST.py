@@ -85,21 +85,18 @@ def block_statistic(sequence)->tuple:
     :return: statistic as tuple
     """
     blocks = [sequence[i:i+8] for i in range(0, len(sequence), 8)]
-    V = [0, 0, 0, 0]
-
-    switch = {
-        1: lambda: V.__setitem__(0, V[0] + 1),
-        2: lambda: V.__setitem__(1, V[1] + 1),
-        3: lambda: V.__setitem__(2, V[2] + 1),
-        'default': lambda: V.__setitem__(3, V[3] + 1)
-    }
+    V1, V2, V3, V4 = 0, 0, 0, 0
 
     for block in blocks:
         max_len = max_consecutive_ones(block)
 
-        switch.get(max_len, switch['default'])()
+        match max_len:
+            case 1: V1+=1
+            case 2: V2+=1
+            case 3: V3+=1
+            case _: V4+=1
 
-    return tuple(V)
+    return V1, V2, V3, V4
 
 
 def longest_sequence_in_block_test(results: tuple)->int:
