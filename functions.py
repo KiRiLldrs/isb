@@ -4,7 +4,6 @@ import itertools
 import json
 from typing import Generator
 
-import window
 import CONST
 
 
@@ -66,32 +65,3 @@ def luhn_check(card_number: str)->bool:
     print(f"Sum: {sum(numbers)}")
     print(f"Remainder of the division by 10: {sum(numbers) % 10}")
     return sum(numbers) % 10 == 0
-
-
-def main():
-    not_none_count = 0
-    card_number = None
-
-    for bin in CONST.SBERBANK_VISA_DEBIT_BINS:
-        card_number = find_card_number(bin, CONST.LAST_FOUR, CONST.HASH)
-        if card_number:
-            write_report(get_report(card_number, bin, CONST.HASH, CONST.LAST_FOUR))
-            not_none_count = 1
-            break
-
-    if luhn_check(card_number) == 1:
-        print(f"Card number is correct")
-    else:
-        print(f"Card number isn't correct")
-
-
-    if not_none_count == 0:
-        print(f"Not a single correct card number was found!")
-
-
-if __name__ == "__main__":
-    #main()
-    app = window.App()
-    app.run()
-
-
