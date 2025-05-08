@@ -4,6 +4,7 @@ import itertools
 import json
 from typing import Generator
 
+import functions
 import window
 import CONST
 
@@ -91,6 +92,7 @@ def main():
 
 if __name__ == "__main__":
     #main()
+    functions.clear_report()
     app = window.App()
     app.run()
 

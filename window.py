@@ -18,6 +18,9 @@ class App:
         self.console = None
         self.setup_console()
 
+        self.awaiting_input = False
+        self.input_callback = None
+
     def setup_ui(self):
 
         self.root.title("01001000 011䷄䷅䷆䷇0001 0101䷁01011 ䷀䷂1䷃0䷈䷉䷊䷋ █▒▒0011 01▒▒▒▒▒▒▒ 10%")
@@ -39,13 +42,13 @@ class App:
         button_frame = Frame(self.root, bg='', padx=10, pady=10)
         button_frame.place(relx=0.5, rely=0.5, anchor="center")
 
-        Frame(self.root, height=50).pack()
+        Frame(self.root, height=40).pack()
         Button(self.root, text="Find a card number", width=30, height=2,
                command=self.on_find_card_number).pack(pady=10)
         Button(self.root, text="Check the report", width=30, height=2,
                command=self.on_check_the_report).pack(pady=10)
-        Button(self.root, text="Change the data", width=30, height=2,
-               command=self.on_change_the_data).pack(pady=10)
+        Button(self.root, text="Luhn algorithm", width=30, height=2,
+               command=self.on_luhn_algorithm).pack(pady=10)
         Button(self.root, text="Experiment", width=30, height=2).pack(pady=10)
 
         Button(self.root, text="Clear", width=10, height=1,
@@ -123,22 +126,54 @@ class App:
 
         card_number = None
 
-        for bin in CONST.SBERBANK_VISA_DEBIT_BINS:
-            card_number = functions.find_card_number(bin, CONST.LAST_FOUR, CONST.HASH)
-            if card_number:
-                self.write_to_console(f"Result was found: {card_number}")
-                functions.write_report(functions.get_report(card_number, bin, CONST.HASH, CONST.LAST_FOUR))
-                self.write_to_console(f"Result was saved to report")
-                break
+        try:
+
+            for bin in CONST.SBERBANK_VISA_DEBIT_BINS:
+                card_number = functions.find_card_number(bin, CONST.LAST_FOUR, CONST.HASH)
+                if card_number:
+                    self.write_to_console(f"Result was found: {card_number}")
+                    functions.write_report(functions.get_report(card_number, bin, CONST.HASH, CONST.LAST_FOUR))
+                    self.write_to_console(f"Result was saved to report")
+                    break
+        except Exception as e:
+            self.write_to_console(f"Result wasn't found! {e}", "red")
 
     def on_find_card_number(self):
         self.write_to_console("The card number is being selected...")
 
         self.root.after(500, self.run_search)
 
+    def on_luhn_algorithm(self):
+        try:
+            card_number = functions.get_json_data()["card_number"]
+
+            self.write_to_console(f"Initialization of the algorithm: ", "yellow")
+            self.write_to_console(f"card_number: {card_number}")
+
+            numbers = [int(d) for d in reversed(card_number)]
+            self.write_to_console(f"Reverse: {numbers}")
+
+            for i in range(1, len(card_number), 2):
+                doubled = numbers[i] * 2
+                numbers[i] = doubled - 9 if doubled > 9 else doubled
+            self.write_to_console(f"Doubling digits in odd positions: {numbers}")
+            self.write_to_console(f"Sum: {sum(numbers)}")
+            self.write_to_console(f"Remainder of the division by 10: {sum(numbers) % 10}")
+
+            if sum(numbers)%10 == 0:
+                self.write_to_console(f"card number is correct", "green")
+            else:
+                self.write_to_console(f"card number isn't correct", "red")
+        except KeyError:
+            self.write_to_console(f"Report is empty!", "red")
+
+
     def on_check_the_report(self):
-        with open('card_search_result.json', 'r', encoding='utf-8') as file:
-            data = json.load(file)
+        data = functions.get_json_data()
+
+        if data == {}:
+            self.write_to_console(f"Report is empty!", "red")
+            return
 
         for key, value in data.items():
             self.write_to_console(f"{key}: {value}")
@@ -146,8 +181,8 @@ class App:
     def on_clear(self):
         self.console.delete("1.0", "end")
 
-    def on_change_the_data(self):
-        self.write_to_console("Input the new hash: ", color="red")
+
+
 
     def run(self):
         self.root.mainloop()

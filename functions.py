@@ -41,8 +41,8 @@ def get_report(result: str | None, bin: str, hash: str, last_four: str)-> dict[s
         "status": "success" if result else "fail",
         "card_number": result,
         "bin": bin,
-        "hash": hash,
         "last_four_numbers": last_four,
+        "hash": hash,
         "processes_used": get_num_processes()
     }
     return report
@@ -65,3 +65,13 @@ def luhn_check(card_number: str)->bool:
     print(f"Sum: {sum(numbers)}")
     print(f"Remainder of the division by 10: {sum(numbers) % 10}")
     return sum(numbers) % 10 == 0
+
+
+def get_json_data():
+    with open(CONST.JSON_RES, 'r') as file:
+        data = json.load(file)
+    return data
+
+def clear_report():
+    with open(CONST.JSON_RES, 'w') as file:
+        json.dump({}, file)
