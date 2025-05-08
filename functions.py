@@ -3,6 +3,9 @@ import multiprocessing
 import itertools
 import json
 from typing import Generator
+import time
+
+import matplotlib.pyplot as plt
 
 import CONST
 
@@ -23,17 +26,35 @@ def get_num_processes()->int:
     return multiprocessing.cpu_count()
 
 
-def find_card_number(bin: str, last_four: str, hash: str)-> str:
+def find_card_number(bin: str, last_four: str, hash: str, num_processes=get_num_processes())-> str | None:
     result = None
-    with multiprocessing.Pool(processes=get_num_processes()) as pool:
+    with multiprocessing.Pool(processes=num_processes) as pool:
         tasks = ((hash, num) for num in generate_possible_numbers(bin, last_four)) #создание генератора задач
-        for res in pool.imap_unordered(check_card_hash, tasks, chunksize=10000):
+        for res in pool.imap_unordered(check_card_hash, tasks):
             if res:
                 result = res
                 pool.terminate()
                 break
 
     return result
+
+
+def get_graph(time_data: list)->None:
+    processes = list(range(1,int(get_num_processes()*1.5) + 1))
+    plt.figure(figsize=(10, 5))
+    plt.plot(processes, time_data)
+
+    plt.title("Time dependence on the number of processes")
+    plt.xlabel("Number of processes")
+    plt.ylabel("Time (seconds)")
+
+    plt.xticks(processes)
+    plt.grid(True)
+
+    min_time = min(time_data)
+    min_processes = time_data.index(min_time) + 1
+    plt.scatter(min_processes, min_time, color="red", label="Point of global minimum")
+    plt.show()
 
 
 def get_report(result: str | None, bin: str, hash: str, last_four: str)-> dict[str, str | None | int]:

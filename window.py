@@ -1,7 +1,7 @@
 import json
 import time
 from threading import Thread
-
+import time
 from PIL import Image, ImageTk
 from tkinter import simpledialog, messagebox, filedialog, Tk, Label, Frame, \
     Button, Scrollbar, Text, WORD, BOTH, RIGHT, Y
@@ -49,7 +49,8 @@ class App:
                command=self.on_check_the_report).pack(pady=10)
         Button(self.root, text="Luhn algorithm", width=30, height=2,
                command=self.on_luhn_algorithm).pack(pady=10)
-        Button(self.root, text="Experiment", width=30, height=2).pack(pady=10)
+        Button(self.root, text="Experiment", width=30, height=2,
+               command=self.on_experiment).pack(pady=10)
 
         Button(self.root, text="Clear", width=10, height=1,
                command=self.on_clear).place(x=770,y=590)
@@ -119,11 +120,12 @@ class App:
 
         Thread(target=typewriter_effect(), daemon=True).start()
 
-    def run_search(self):
-        bin = CONST.SBERBANK_VISA_DEBIT_BINS
+    def on_find_card_number(self):
+        self.write_to_console("\n")
+        self.write_to_console("The card number is being selected...")
+
         last_four = CONST.LAST_FOUR
         hash = CONST.HASH
-
         card_number = None
 
         try:
@@ -138,12 +140,8 @@ class App:
         except Exception as e:
             self.write_to_console(f"Result wasn't found! {e}", "red")
 
-    def on_find_card_number(self):
-        self.write_to_console("The card number is being selected...")
-
-        self.root.after(500, self.run_search)
-
     def on_luhn_algorithm(self):
+        self.write_to_console("\n")
         try:
             card_number = functions.get_json_data()["card_number"]
 
@@ -161,14 +159,15 @@ class App:
             self.write_to_console(f"Remainder of the division by 10: {sum(numbers) % 10}")
 
             if sum(numbers)%10 == 0:
-                self.write_to_console(f"card number is correct", "green")
+                self.write_to_console(f"Card number is correct", "green")
             else:
-                self.write_to_console(f"card number isn't correct", "red")
+                self.write_to_console(f"Card number isn't correct", "red")
         except KeyError:
             self.write_to_console(f"Report is empty!", "red")
 
 
     def on_check_the_report(self):
+        self.write_to_console("\n")
         data = functions.get_json_data()
 
         if data == {}:
@@ -178,11 +177,28 @@ class App:
         for key, value in data.items():
             self.write_to_console(f"{key}: {value}")
 
+    def on_experiment(self):
+        self.write_to_console("\n")
+        last_four = CONST.LAST_FOUR
+        hash = CONST.HASH
+        card_number = None
+
+        time_res = []
+        self.write_to_console(f"Number of processes: time")
+
+        for i in range(1,int(functions.get_num_processes()*1.5) + 1):
+            time_start = time.time()
+            for bin in CONST.SBERBANK_VISA_DEBIT_BINS:
+                if functions.find_card_number(bin, CONST.LAST_FOUR, CONST.HASH, i):
+                    res = time.time()-time_start
+                    self.write_to_console(f"{i}: {res}")
+                    time_res.append(res)
+                    break
+
+        functions.get_graph(time_res)
+
     def on_clear(self):
         self.console.delete("1.0", "end")
-
-
-
 
     def run(self):
         self.root.mainloop()
