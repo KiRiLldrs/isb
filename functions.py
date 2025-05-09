@@ -1,9 +1,8 @@
-import hashlib
-import multiprocessing
-import itertools
 import json
+import multiprocessing
 from typing import Generator
-import time
+import hashlib
+import itertools
 
 import matplotlib.pyplot as plt
 
@@ -35,7 +34,6 @@ def find_card_number(bin: str, last_four: str, hash: str, num_processes=get_num_
                 result = res
                 pool.terminate()
                 break
-
     return result
 
 
@@ -68,6 +66,7 @@ def get_report(result: str | None, bin: str, hash: str, last_four: str)-> dict[s
     }
     return report
 
+
 def write_report(report: dict[str, str | None | int])-> None:
     with open(CONST.JSON_RES, 'w') as f:
         json.dump(report, f, indent=2, ensure_ascii=False)
@@ -92,6 +91,7 @@ def get_json_data():
     with open(CONST.JSON_RES, 'r') as file:
         data = json.load(file)
     return data
+
 
 def clear_report():
     with open(CONST.JSON_RES, 'w') as file:

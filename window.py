@@ -1,14 +1,11 @@
-import json
-import time
 from threading import Thread
 import time
+from tkinter import Tk, Label, Frame, Button, Scrollbar, Text, WORD, BOTH, RIGHT
 from PIL import Image, ImageTk
-from tkinter import simpledialog, messagebox, filedialog, Tk, Label, Frame, \
-    Button, Scrollbar, Text, WORD, BOTH, RIGHT, Y
-
 
 import CONST
 import functions
+
 
 class App:
     def __init__(self):
@@ -21,8 +18,8 @@ class App:
         self.awaiting_input = False
         self.input_callback = None
 
-    def setup_ui(self):
 
+    def setup_ui(self):
         self.root.title("01001000 011䷄䷅䷆䷇0001 0101䷁01011 ䷀䷂1䷃0䷈䷉䷊䷋ █▒▒0011 01▒▒▒▒▒▒▒ 10%")
         self.root.geometry("900x650")
         self.root.resizable(False, False)
@@ -30,7 +27,6 @@ class App:
         img = Image.open("icon.jpg").resize((32,32))
         icon = ImageTk.PhotoImage(img)
         self.root.iconphoto(True, icon)
-
 
         bg_image = Image.open("background.jpg").resize((900, 650), Image.Resampling.LANCZOS)
         bg_photo = ImageTk.PhotoImage(bg_image)
@@ -71,6 +67,7 @@ class App:
                        wrap=WORD)
         self.console.pack(expand=True, fill=BOTH)
         console_scroll.config(command=self.console.yview)
+
 
     def write_to_console(self, text: str, color = "white"):
         def typewriter_effect():
@@ -120,6 +117,7 @@ class App:
 
         Thread(target=typewriter_effect(), daemon=True).start()
 
+
     def on_find_card_number(self):
         self.write_to_console("\n")
         self.write_to_console("The card number is being selected...")
@@ -129,7 +127,6 @@ class App:
         card_number = None
 
         try:
-
             for bin in CONST.SBERBANK_VISA_DEBIT_BINS:
                 card_number = functions.find_card_number(bin, CONST.LAST_FOUR, CONST.HASH)
                 if card_number:
@@ -139,6 +136,7 @@ class App:
                     break
         except Exception as e:
             self.write_to_console(f"Result wasn't found! {e}", "red")
+
 
     def on_luhn_algorithm(self):
         self.write_to_console("\n")
@@ -177,6 +175,7 @@ class App:
         for key, value in data.items():
             self.write_to_console(f"{key}: {value}")
 
+
     def on_experiment(self):
         self.write_to_console("\n")
         last_four = CONST.LAST_FOUR
@@ -197,8 +196,16 @@ class App:
 
         functions.get_graph(time_res)
 
+
     def on_clear(self):
         self.console.delete("1.0", "end")
 
+
     def run(self):
         self.root.mainloop()
+
+
+if __name__ == "__main__":
+    functions.clear_report()
+    app = App()
+    app.run()
