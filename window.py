@@ -1,14 +1,20 @@
+import subprocess
+import sys
+import json
 from threading import Thread
 import time
 from tkinter import Tk, Label, Frame, Button, Scrollbar, Text, WORD, BOTH, RIGHT
 from PIL import Image, ImageTk
 
+from multiprocessing import Process
+
 import CONST
 import functions
+from functions import CardFinder
 
 
 class App:
-    def __init__(self):
+    def __init__(self, class_card_finder_instance):
         self.root = Tk()
         self.setup_ui()
 
@@ -17,6 +23,8 @@ class App:
 
         self.awaiting_input = False
         self.input_callback = None
+
+        self.card_finder = class_card_finder_instance
 
 
     def setup_ui(self):
@@ -122,16 +130,14 @@ class App:
         self.write_to_console("\n")
         self.write_to_console("The card number is being selected...")
 
-        last_four = CONST.LAST_FOUR
-        hash = CONST.HASH
         card_number = None
 
         try:
             for bin in CONST.SBERBANK_VISA_DEBIT_BINS:
-                card_number = functions.find_card_number(bin, CONST.LAST_FOUR, CONST.HASH)
+                card_number = CardFinder.find_card_number(self.card_finder, bin)
                 if card_number:
                     self.write_to_console(f"Result was found: {card_number}")
-                    functions.write_report(functions.get_report(card_number, bin, CONST.HASH, CONST.LAST_FOUR))
+                    CardFinder.write_report(self.card_finder,CardFinder.get_report(self.card_finder, card_number, bin))
                     self.write_to_console(f"Result was saved to report")
                     break
         except Exception as e:
@@ -141,7 +147,7 @@ class App:
     def on_luhn_algorithm(self):
         self.write_to_console("\n")
         try:
-            card_number = functions.get_json_data()["card_number"]
+            card_number = CardFinder.get_json_data(self.card_finder)["card_number"]
 
             self.write_to_console(f"Initialization of the algorithm: ", "yellow")
             self.write_to_console(f"card_number: {card_number}")
@@ -166,7 +172,7 @@ class App:
 
     def on_check_the_report(self):
         self.write_to_console("\n")
-        data = functions.get_json_data()
+        data = CardFinder.get_json_data(self.card_finder)
 
         if data == {}:
             self.write_to_console(f"Report is empty!", "red")
@@ -178,23 +184,21 @@ class App:
 
     def on_experiment(self):
         self.write_to_console("\n")
-        last_four = CONST.LAST_FOUR
-        hash = CONST.HASH
-        card_number = None
+        self.write_to_console("Running experiment...", "yellow")
 
-        time_res = []
-        self.write_to_console(f"Number of processes: time")
+        settings = {
+            "hash": self.card_finder.hash,
+            "last_four": self.card_finder.last_four,
+            "json_res": self.card_finder.json_res
+        }
 
-        for i in range(1,int(functions.get_num_processes()*1.5) + 1):
-            time_start = time.time()
-            for bin in CONST.SBERBANK_VISA_DEBIT_BINS:
-                if functions.find_card_number(bin, CONST.LAST_FOUR, CONST.HASH, i):
-                    res = time.time()-time_start
-                    self.write_to_console(f"{i}: {res}")
-                    time_res.append(res)
-                    break
+        settings_path = "temp_settings.json"
+        with open(settings_path, 'w') as f:
+            json.dump(settings, f)
 
-        functions.get_graph(time_res)
+        python_exe = sys.executable
+        subprocess.Popen(
+            [python_exe, "experiment_runner.py", settings_path, str(int(CardFinder.get_num_processes() * 1.5))])
 
 
     def on_clear(self):
@@ -206,6 +210,7 @@ class App:
 
 
 if __name__ == "__main__":
-    functions.clear_report()
-    app = App()
+    card_finder = CardFinder()
+    CardFinder.clear_report(card_finder)
+    app = App(card_finder)
     app.run()
