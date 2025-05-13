@@ -1,12 +1,11 @@
 import subprocess
 import sys
 import json
+from multiprocessing import Process
 from threading import Thread
 import time
 from tkinter import Tk, Label, Frame, Button, Scrollbar, Text, WORD, BOTH, RIGHT
 from PIL import Image, ImageTk
-
-from multiprocessing import Process
 
 import CONST
 import functions
